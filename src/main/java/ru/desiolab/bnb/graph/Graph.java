@@ -5,18 +5,18 @@ import java.util.List;
 import java.util.Optional;
 
 public class Graph {
-    private final List<Node> neighbours;
+    private final List<Node> nodes;
 
     public Graph() {
-        this.neighbours = new ArrayList<>();
-        neighbours.add(new Node(1));
+        this.nodes = new ArrayList<>();
+        nodes.add(new Node(1));
     }
 
     public Node getNode(int nodeIndex) {
-        Optional<Node> result = neighbours.stream().filter(node -> node.getIndex() == nodeIndex).findFirst();
+        Optional<Node> result = nodes.stream().filter(node -> node.getIndex() == nodeIndex).findFirst();
         return result.orElseGet(() -> {
             Node node = new Node(nodeIndex);
-            neighbours.add(node);
+            nodes.add(node);
             return node;
         });
     }
@@ -28,7 +28,7 @@ public class Graph {
         secondNode.addNeighbour(firstNode);
     }
 
-    public List<Node> getNeighbours() {
-        return neighbours;
+    public List<Node> getNodes() {
+        return nodes;
     }
 }

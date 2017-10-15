@@ -8,6 +8,7 @@ public class Node {
     private final int index;
     private final List<Node> neighbours;
 
+
     public Node(int index) {
         this.index = index;
         this.neighbours = new ArrayList<>();
@@ -21,6 +22,10 @@ public class Node {
         if (!neighbours.contains(node)) {
             neighbours.add(node);
         }
+    }
+
+    public List<Node> getNeighbours() {
+        return neighbours;
     }
 
     @Override

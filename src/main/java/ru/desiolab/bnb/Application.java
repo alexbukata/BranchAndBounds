@@ -1,8 +1,8 @@
 package ru.desiolab.bnb;
 
+import ru.desiolab.bnb.algorithms.GreedyChromaticNumberAlgorithm;
 import ru.desiolab.bnb.graph.Graph;
 import ru.desiolab.bnb.graph.GraphParser;
-import ru.desiolab.bnb.graph.Node;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -17,8 +17,8 @@ public class Application {
         } catch (IOException e) {
             throw new IllegalStateException("Error", e);
         }
-        for (Node node : graph.getNeighbours()) {
-            System.out.println(node.getIndex());
-        }
+        int upperBound = GreedyChromaticNumberAlgorithm.forGraph(graph);
+        int lowerBound = 0;
+
     }
 }
