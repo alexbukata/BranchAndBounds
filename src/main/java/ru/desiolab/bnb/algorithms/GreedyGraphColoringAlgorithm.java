@@ -5,8 +5,8 @@ import ru.desiolab.bnb.graph.Node;
 
 import java.util.*;
 
-public class GreedyChromaticNumberAlgorithm {
-    public static int forGraph(Graph graph) {
+public class GreedyGraphColoringAlgorithm {
+    public static Map<Integer, Integer> forGraph(Graph graph) {
         List<Node> nodes = new ArrayList<>(graph.getNodes());
         Comparator<Node> degreeComparator = Comparator.comparingInt(o -> o.getNeighbours().size());
         nodes.sort(degreeComparator.reversed());
@@ -16,11 +16,14 @@ public class GreedyChromaticNumberAlgorithm {
             List<Node> neighbours = new ArrayList<>(node.getNeighbours());
             neighbours.sort(degreeComparator.reversed()); // bottleneck!
             ListIterator<Node> neighboursIterator = neighbours.listIterator();
-            while (color.equals(colors.getOrDefault(neighboursIterator.next().getIndex(), 0)) && neighboursIterator.hasNext()) {
+            while (color.equals(colors.getOrDefault(neighboursIterator.next().getIndex(), 0))) {
                 color++;
+                if (!neighboursIterator.hasNext()){
+                    break;
+                }
             }
             colors.put(node.getIndex(), color);
         }
-        return Collections.max(colors.values());
+        return colors;
     }
 }

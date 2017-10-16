@@ -39,6 +39,6 @@ public class Node {
 
     @Override
     public int hashCode() {
-        return Objects.hash(index, neighbours);
+        return Objects.hash(index);
     }
 }
