@@ -24,15 +24,16 @@ public class BranchAndBoundsMaxClique {
     }
 
     private List<Node> branchAndBounds(List<Node> candidates, List<Node> clique) {
-//        System.out.println(Arrays.toString(clique.stream().map(Node::getIndex).toArray()));
+        System.out.println(Arrays.toString(clique.stream().map(Node::getIndex).toArray()));
+//        if (clique.size() == 15){
+//            System.out.println("gotcha");
+//        }
         Set<Integer> cliqueColors = new HashSet<>();
         for (Node node : clique) {
             cliqueColors.add(colors.get(node.getIndex()));
         }
-        if (cliqueColors.size() >= chromaticColor) {
-            return clique;
-        }
-        List<Node> maxClique = new ArrayList<>();
+
+        List<Node> maxClique = new ArrayList<>(clique);
         for (Node candidate : candidates) {
             Integer candidateColor = colors.get(candidate.getIndex());
             if (cliqueColors.contains(candidateColor)) {
@@ -46,6 +47,9 @@ public class BranchAndBoundsMaxClique {
             newClique.add(candidate);
 
             newClique = branchAndBounds(newCandidates, newClique);
+            if (newClique.size() >= chromaticColor) {
+                return newClique;
+            }
             if (maxClique.size() < newClique.size())
                 maxClique = newClique;
         }
