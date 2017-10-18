@@ -21,12 +21,14 @@ public class Application {
         } catch (IOException e) {
             throw new IllegalStateException("Error", e);
         }
-        Map<Integer, Integer> colors = GreedyGraphColoringAlgorithm.smartForGraph(graph);
+        Map<Integer, Integer> colors = GreedyGraphColoringAlgorithm.forNodes(graph.getNodes());
         System.out.println(colors);
-        BranchAndBoundsMaxClique algorithm = new BranchAndBoundsMaxClique(graph, colors);
-        List<Node> clique = algorithm.findClique();
+        BranchAndBoundsMaxClique algorithm = new BranchAndBoundsMaxClique(graph);
+        List<Node> clique = algorithm.findClique(colors);
         for (Node node : clique) {
             System.out.print(node.getIndex() + ", ");
         }
+        System.out.println();
+        System.out.print(clique.size());
     }
 }
