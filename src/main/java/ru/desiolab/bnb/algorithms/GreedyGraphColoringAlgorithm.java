@@ -25,7 +25,7 @@ public class GreedyGraphColoringAlgorithm {
                 maxColor = k;
                 independentSets.add(k, new HashSet<>());
             }
-            colors.put(node.getIndex(), k);
+            colors.put(node.getIndex(), k + 1);
             independentSets.get(k).add(node);
         }
         return colors;
