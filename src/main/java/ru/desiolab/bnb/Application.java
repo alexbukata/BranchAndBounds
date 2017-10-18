@@ -21,6 +21,7 @@ public class Application {
         } catch (IOException e) {
             throw new IllegalStateException("Error", e);
         }
+        long start = System.currentTimeMillis();
         Map<Integer, Integer> colors = GreedyGraphColoringAlgorithm.forNodes(graph.getNodes());
         System.out.println(colors);
         BranchAndBoundsMaxClique algorithm = new BranchAndBoundsMaxClique(graph);
@@ -29,6 +30,7 @@ public class Application {
             System.out.print(node.getIndex() + ", ");
         }
         System.out.println();
-        System.out.print(clique.size());
+        System.out.println(clique.size());
+        System.out.println("Time: " + (System.currentTimeMillis() - start));
     }
 }
