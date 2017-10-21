@@ -48,4 +48,8 @@ public class BranchAndBoundsMaxClique {
             }
         }
     }
+
+    public List<Node> getCliqueMax() {
+        return cliqueMax;
+    }
 }
