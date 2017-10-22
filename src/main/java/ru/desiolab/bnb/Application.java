@@ -21,10 +21,21 @@ import java.util.concurrent.TimeoutException;
 public class Application {
     public static void main(String[] args) throws InterruptedException {
         String pathToGraph = args[0];
-        Integer timeLimit = Integer.parseInt(args[1]);
+
         GraphJob graphJob = new GraphJob();
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         SimpleTimeLimiter simpleTimeLimiter = SimpleTimeLimiter.create(executorService);
+
+        Integer timeLimit;
+        if (args.length > 1) {
+            timeLimit = Integer.parseInt(args[1]);
+        } else {
+            long first = System.currentTimeMillis();
+            graphJob.graphJob(pathToGraph);
+            System.out.println("Time: " + (System.currentTimeMillis() - first) / 1000f + "s");
+            return;
+        }
+
         try {
             simpleTimeLimiter.runWithTimeout(() -> graphJob.graphJob(pathToGraph), timeLimit, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
