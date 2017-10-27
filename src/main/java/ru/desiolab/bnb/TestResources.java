@@ -22,5 +22,6 @@ public class TestResources {
             writer.write("\n");
             writer.flush();
         }
+        writer.close();
     }
 }
