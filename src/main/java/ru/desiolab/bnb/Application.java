@@ -44,10 +44,10 @@ public class Application {
         System.exit(0);
     }
 
-    private static class GraphJob {
+    public static class GraphJob {
         private BranchAndBoundsMaxClique algorithm;
 
-        public void graphJob(String pathToGraph) {
+        public List<Node> graphJob(String pathToGraph) {
             Graph graph;
             try (BufferedReader reader = new BufferedReader(new FileReader(pathToGraph))) {
                 graph = GraphParser.fromStream(reader.lines());
@@ -59,6 +59,7 @@ public class Application {
             List<Node> clique = algorithm.findClique(colors);
 
             System.out.println(clique.size() + " " + Arrays.toString(clique.stream().map(Node::getIndex).toArray()));
+            return clique;
         }
 
         public BranchAndBoundsMaxClique getAlgorithm() {
