@@ -1,5 +1,6 @@
 package ru.desiolab.bnb;
 
+import com.google.common.util.concurrent.SimpleTimeLimiter;
 import ru.desiolab.bnb.graph.Node;
 
 import java.io.BufferedWriter;
@@ -9,6 +10,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 public class TestResources {
@@ -18,12 +23,24 @@ public class TestResources {
         Application.GraphJob graphJob = new Application.GraphJob();
         List<File> files = Arrays.stream(resourcesDir.listFiles()).sorted(Comparator.comparingLong(File::length)).collect(Collectors.toList());
         for (File testFile : files) {
-            long first = System.currentTimeMillis();
-            List<Node> nodes = graphJob.graphJob(testFile.getPath());
-            float result = (System.currentTimeMillis() - first) / 1000f;
-            System.out.println("done");
-            writer.write(testFile.getName() + " " + nodes.size() + " " + result);
-            writer.write("\n");
+            System.out.println(testFile.getName());
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            SimpleTimeLimiter simpleTimeLimiter = SimpleTimeLimiter.create(executorService);
+            try {
+                long first = System.currentTimeMillis();
+                simpleTimeLimiter.runWithTimeout(() -> graphJob.graphJob(testFile.getPath()), 60, TimeUnit.MINUTES);
+                float result = (System.currentTimeMillis() - first) / 1000f;
+                System.out.println("done");
+                List<Node> nodes = graphJob.getAlgorithm().getCliqueMax();
+                writer.write(testFile.getName() + " " + nodes.size() + " " + result + "sec");
+                writer.write("\n");
+            } catch (TimeoutException e) {
+                List<Node> nodes = graphJob.getAlgorithm().getCliqueMax();
+                writer.write(testFile.getName() + " " + nodes.size() + " >=1hr");
+                writer.write("\n");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             writer.flush();
         }
         writer.close();
