@@ -58,7 +58,6 @@ public class Application {
             algorithm = new BranchAndBoundsMaxClique(graph);
             List<Node> clique = algorithm.findClique(colors);
 
-            System.out.println(clique.size() + " " + Arrays.toString(clique.stream().map(Node::getIndex).toArray()));
             return clique;
         }
 
