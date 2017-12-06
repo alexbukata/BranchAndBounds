@@ -54,7 +54,9 @@ public class Application {
             } catch (IOException e) {
                 throw new IllegalStateException("Error", e);
             }
-            Map<Integer, Integer> colors = GreedyGraphColoringAlgorithm.forNodes(graph.getNodes());
+            GreedyGraphColoringAlgorithm coloringAlgorithm = new GreedyGraphColoringAlgorithm(graph.getNodes());
+            coloringAlgorithm.calculate();
+            Map<Integer, Integer> colors = coloringAlgorithm.getColors();
             algorithm = new BranchAndBoundsMaxClique(graph);
             List<Node> clique = algorithm.findClique(colors);
 

@@ -5,10 +5,19 @@ import ru.desiolab.bnb.graph.Node;
 import java.util.*;
 
 public class GreedyGraphColoringAlgorithm {
-    public static Map<Integer, Integer> forNodes(List<Node> nodes) {
+    private final List<Set<Node>> independentSets;
+    private final Map<Integer, Integer> colors;
+    private final List<Node> nodes;
+
+    public GreedyGraphColoringAlgorithm(List<Node> nodes) {
+        this.independentSets = new ArrayList<>();
+        this.colors = new HashMap<>();
+        this.nodes = nodes;
+    }
+
+
+    public Map<Integer, Integer> calculate() {
         int maxColor = 0;
-        Map<Integer, Integer> colors = new HashMap<>();
-        List<Set<Node>> independentSets = new ArrayList<>();
         independentSets.add(new HashSet<>());
         for (Node node : nodes) {
             int k = 0;
@@ -28,6 +37,14 @@ public class GreedyGraphColoringAlgorithm {
             colors.put(node.getIndex(), k + 1);
             independentSets.get(k).add(node);
         }
+        return colors;
+    }
+
+    public List<Set<Node>> getIndependentSets() {
+        return independentSets;
+    }
+
+    public Map<Integer, Integer> getColors() {
         return colors;
     }
 }

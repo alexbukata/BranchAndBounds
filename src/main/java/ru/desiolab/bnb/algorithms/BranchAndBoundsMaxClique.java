@@ -40,7 +40,7 @@ public class BranchAndBoundsMaxClique {
             currentCandidates.retainAll(candidate.getNeighbours()); // clean up candidates (saving order)
 
             if (currentCandidates.size() > 0) {
-                Map<Integer, Integer> newColors = GreedyGraphColoringAlgorithm.forNodes(currentCandidates); //recalculate subgraph colors
+                Map<Integer, Integer> newColors = GreedyGraphColoringAlgorithm.calculate(currentCandidates); //recalculate subgraph colors
                 currentCandidates.sort(Comparator.<Node>comparingInt(value -> newColors.get(value.getIndex())).reversed()); //sort by color numbers (descending)
                 branchAndBounds(currentCandidates, currentClique, newColors);
             } else if (cliqueMax.size() < currentClique.size()) {
