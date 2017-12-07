@@ -1,5 +1,7 @@
 package ru.desiolab.bnb;
 
+import ilog.concert.IloException;
+import ru.desiolab.bnb.algorithms.BranchAndBoundsCplex;
 import ru.desiolab.bnb.algorithms.GreedyGraphColoringAlgorithm;
 import ru.desiolab.bnb.graph.Graph;
 import ru.desiolab.bnb.graph.GraphParser;
@@ -11,8 +13,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-public class CplexApplication {
-    public static void main(String[] args) {
+public class BranchAndBoundCplexApplication {
+    public static void main(String[] args) throws IloException {
         String pathToGraph = args[0];
         Graph graph;
         try (BufferedReader reader = new BufferedReader(new FileReader(pathToGraph))) {
@@ -24,5 +26,7 @@ public class CplexApplication {
         coloringAlgorithm.calculate();
         List<Set<Node>> independentSets = coloringAlgorithm.getIndependentSets();
         int chromaticNumber = independentSets.size();
+        BranchAndBoundsCplex branchAndBoundsCplex = new BranchAndBoundsCplex(graph.getNodes(), independentSets, chromaticNumber);
+        branchAndBoundsCplex.compute();
     }
 }
