@@ -1,7 +1,6 @@
 package ru.desiolab.bnb;
 
 import com.google.common.util.concurrent.SimpleTimeLimiter;
-import ru.desiolab.bnb.graph.Node;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -20,7 +19,7 @@ public class TestResources {
     public static void main(String[] args) throws IOException {
         File resourcesDir = new File("resources");
         BufferedWriter writer = new BufferedWriter(new FileWriter("output.txt"));
-        Application.GraphJob graphJob = new Application.GraphJob();
+        BranchAndBoundCplexApplication.GraphJob graphJob = new BranchAndBoundCplexApplication.GraphJob();
         List<File> files = Arrays.stream(resourcesDir.listFiles()).sorted(Comparator.comparingLong(File::length)).collect(Collectors.toList());
         for (File testFile : files) {
             System.out.println(testFile.getName());
@@ -31,11 +30,11 @@ public class TestResources {
                 simpleTimeLimiter.runWithTimeout(() -> graphJob.graphJob(testFile.getPath()), 60, TimeUnit.MINUTES);
                 float result = (System.currentTimeMillis() - first) / 1000f;
                 System.out.println("done");
-                List<Node> nodes = graphJob.getAlgorithm().getCliqueMax();
+                List<Integer> nodes = graphJob.getAlgorithm().getMaxClique();
                 writer.write(testFile.getName() + " " + nodes.size() + " " + result + "sec");
                 writer.write("\n");
             } catch (TimeoutException e) {
-                List<Node> nodes = graphJob.getAlgorithm().getCliqueMax();
+                List<Integer> nodes = graphJob.getAlgorithm().getMaxClique();
                 writer.write(testFile.getName() + " " + nodes.size() + " >=1hr");
                 writer.write("\n");
             } catch (InterruptedException e) {

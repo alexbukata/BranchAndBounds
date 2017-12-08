@@ -29,4 +29,28 @@ public class BranchAndBoundCplexApplication {
         BranchAndBoundsCplex branchAndBoundsCplex = new BranchAndBoundsCplex(graph.getNodes(), independentSets, chromaticNumber);
         branchAndBoundsCplex.compute();
     }
+
+    public static class GraphJob {
+        private BranchAndBoundsCplex branchAndBoundsCplex;
+
+        public List<Integer> graphJob(String pathToGraph) {
+            Graph graph;
+            try (BufferedReader reader = new BufferedReader(new FileReader(pathToGraph))) {
+                graph = GraphParser.fromStream(reader.lines());
+            } catch (IOException e) {
+                throw new IllegalStateException("Error", e);
+            }
+            GreedyGraphColoringAlgorithm coloringAlgorithm = new GreedyGraphColoringAlgorithm(graph.getNodes());
+            coloringAlgorithm.calculate();
+            List<Set<Node>> independentSets = coloringAlgorithm.getIndependentSets();
+            int chromaticNumber = independentSets.size();
+            this.branchAndBoundsCplex = new BranchAndBoundsCplex(graph.getNodes(), independentSets, chromaticNumber);
+            branchAndBoundsCplex.compute();
+            return branchAndBoundsCplex.getMaxClique();
+        }
+
+        public BranchAndBoundsCplex getAlgorithm() {
+            return branchAndBoundsCplex;
+        }
+    }
 }

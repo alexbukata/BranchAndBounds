@@ -77,7 +77,7 @@ public class BranchAndBoundsCplex {
         if (branchCandidate == -1) {
             if (maxClique.size() < currentClique.size()) {
                 System.out.println("New max clique has been found!");
-                System.out.println(currentClique);
+                System.out.println(currentClique + " (" + currentClique.size() + ")");
                 maxClique = currentClique;
             }
             return;
@@ -89,5 +89,9 @@ public class BranchAndBoundsCplex {
         IloRange secondBranchConstraint = cplex.addLe(x[branchCandidate], 0);
         branching();
         cplex.remove(secondBranchConstraint);
+    }
+
+    public List<Integer> getMaxClique() {
+        return maxClique;
     }
 }
