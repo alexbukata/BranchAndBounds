@@ -1,15 +1,14 @@
 package ru.desiolab.bnb.algorithms;
 
 import ilog.concert.IloException;
-import ilog.concert.IloLinearIntExpr;
 import ilog.concert.IloLinearNumExpr;
 import ilog.concert.IloNumVar;
+import ilog.concert.IloRange;
 import ilog.cplex.IloCplex;
 import ru.desiolab.bnb.graph.Node;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class BranchAndBoundsCplex {
@@ -18,6 +17,9 @@ public class BranchAndBoundsCplex {
     private final List<Node> nodes;
     private final List<Set<Node>> independentSets;
     private final Integer chromaticNumber;
+    private List<Integer> maxClique;
+    private IloCplex cplex;
+    private IloNumVar[] x;
 
     public BranchAndBoundsCplex(List<Node> nodes,
                                 List<Set<Node>> independentSets,
@@ -25,11 +27,13 @@ public class BranchAndBoundsCplex {
         this.nodes = nodes;
         this.independentSets = independentSets;
         this.chromaticNumber = chromaticNumber;
+        this.maxClique = new ArrayList<>();
     }
 
-    private IloCplex initSolver() throws IloException {
-        IloCplex cplex = new IloCplex();
-        IloNumVar[] x = new IloNumVar[nodes.size() + 1];
+    private void initSolver() throws IloException {
+        this.cplex = new IloCplex();
+        cplex.setOut(null);
+        this.x = new IloNumVar[nodes.size() + 1];
         for (int i = 1; i <= nodes.size(); i++) {
             x[i] = cplex.numVar(0, 1);
         }
@@ -42,46 +46,48 @@ public class BranchAndBoundsCplex {
         BranchAndBoundConstraints.eachNodeConstraint(cplex, nodes, x);
         BranchAndBoundConstraints.roundRobinConstraints(cplex, nodes, x);
         BranchAndBoundConstraints.independentSetsConstraints(cplex, independentSets, x);
-
-        return cplex;
     }
 
     public void compute() {
         try {
-            IloCplex cplex = initSolver();
-            cplex.solve();
-            Map<Integer, Integer> additionalNodesConstraints = new HashMap<>();
-            branching(cplex, additionalNodesConstraints);
+            initSolver();
+            branching();
+            System.out.println("Answer: " + maxClique);
         } catch (IloException e) {
             e.printStackTrace();
         }
     }
 
-    private void branching(IloCplex previousSolver, Map<Integer, Integer> additionalNodesConstraints) throws IloException {
+    private void branching() throws IloException {
+        if (!cplex.solve() || Math.floor(cplex.getObjValue()) < maxClique.size() || maxClique.size() >= chromaticNumber) {
+            return;
+        }
         Integer branchCandidate = -1;
+        List<Integer> currentClique = new ArrayList<>();
         for (int i = 1; i < x.length; i++) {
-            double value = previousSolver.getValue(x[i]);
-            if (value < 1.0 - EPSILON || value > 0.0 + EPSILON) {
+            double value = cplex.getValue(x[i]);
+            if (value < 1.0 - EPSILON && value > 0.0 + EPSILON) {
                 branchCandidate = i;
                 break;
             }
-        }
-        if (branchCandidate == -1) {
-            System.out.println("Clique has been found!");
-            return;
-        }
-        IloCplex branch1 = initSolver();
-        HashMap<Integer, Integer> firstBranchConstraints = new HashMap<>(additionalNodesConstraints);
-        firstBranchConstraints.put(branchCandidate, 0);
-        for (Map.Entry<Integer, Integer> constraint : firstBranchConstraints.entrySet()) {
-            IloLinearIntExpr linearIntExpr = branch1.linearIntExpr();
-            linearIntExpr.addTerm(x[constraint.getKey()]);
-            if (constraint.getValue() == 0) {
+            if (1.0 - value < EPSILON) {
+                currentClique.add(i);
             }
         }
+        if (branchCandidate == -1) {
+            if (maxClique.size() < currentClique.size()) {
+                System.out.println("New max clique has been found!");
+                System.out.println(currentClique);
+                maxClique = currentClique;
+            }
+            return;
+        }
+        IloRange firstBranchConstraint = cplex.addGe(x[branchCandidate], 1);
+        branching();
+        cplex.remove(firstBranchConstraint);
 
-        IloCplex branch2 = initSolver();
-        HashMap<Integer, Integer> secondBranchConstraints = new HashMap<>(additionalNodesConstraints);
-        secondBranchConstraints.put(branchCandidate, 1);
+        IloRange secondBranchConstraint = cplex.addLe(x[branchCandidate], 0);
+        branching();
+        cplex.remove(secondBranchConstraint);
     }
 }
