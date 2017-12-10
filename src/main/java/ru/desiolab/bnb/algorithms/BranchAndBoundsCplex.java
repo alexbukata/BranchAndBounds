@@ -52,7 +52,7 @@ public class BranchAndBoundsCplex {
         try {
             initSolver();
             branching();
-            System.out.println("Answer: " + maxClique);
+//            System.out.println("Answer: " + maxClique);
         } catch (IloException e) {
             e.printStackTrace();
         }
@@ -76,8 +76,8 @@ public class BranchAndBoundsCplex {
         }
         if (branchCandidate == -1) {
             if (maxClique.size() < currentClique.size()) {
-                System.out.println("New max clique has been found!");
-                System.out.println(currentClique + " (" + currentClique.size() + ")");
+//                System.out.println("New max clique has been found!");
+//                System.out.println(currentClique + " (" + currentClique.size() + ")");
                 maxClique = currentClique;
             }
             return;

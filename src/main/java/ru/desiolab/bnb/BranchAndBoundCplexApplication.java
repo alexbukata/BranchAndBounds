@@ -1,5 +1,6 @@
 package ru.desiolab.bnb;
 
+import com.google.common.util.concurrent.SimpleTimeLimiter;
 import ilog.concert.IloException;
 import ru.desiolab.bnb.algorithms.BranchAndBoundsCplex;
 import ru.desiolab.bnb.algorithms.GreedyGraphColoringAlgorithm;
@@ -12,22 +13,38 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class BranchAndBoundCplexApplication {
     public static void main(String[] args) throws IloException {
         String pathToGraph = args[0];
-        Graph graph;
-        try (BufferedReader reader = new BufferedReader(new FileReader(pathToGraph))) {
-            graph = GraphParser.fromStream(reader.lines());
-        } catch (IOException e) {
-            throw new IllegalStateException("Error", e);
+
+        GraphJob graphJob = new GraphJob();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        SimpleTimeLimiter simpleTimeLimiter = SimpleTimeLimiter.create(executorService);
+
+        Integer timeLimit;
+        if (args.length > 1) {
+            timeLimit = Integer.parseInt(args[1]);
+        } else {
+            long first = System.currentTimeMillis();
+            graphJob.graphJob(pathToGraph);
+            System.out.print((System.currentTimeMillis() - first) / 1000f + "s");
+            System.out.println(" " + graphJob.getAlgorithm().getMaxClique().size() + " " + graphJob.getAlgorithm().getMaxClique());
+            return;
         }
-        GreedyGraphColoringAlgorithm coloringAlgorithm = new GreedyGraphColoringAlgorithm(graph.getNodes());
-        coloringAlgorithm.calculate();
-        List<Set<Node>> independentSets = coloringAlgorithm.getIndependentSets();
-        int chromaticNumber = independentSets.size();
-        BranchAndBoundsCplex branchAndBoundsCplex = new BranchAndBoundsCplex(graph.getNodes(), independentSets, chromaticNumber);
-        branchAndBoundsCplex.compute();
+
+        try {
+            simpleTimeLimiter.runWithTimeout(() -> graphJob.graphJob(pathToGraph), timeLimit, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            System.out.println("0 " + graphJob.getAlgorithm().getMaxClique());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.exit(0);
     }
 
     public static class GraphJob {
