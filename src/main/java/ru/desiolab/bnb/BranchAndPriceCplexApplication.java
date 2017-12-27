@@ -50,7 +50,7 @@ public class BranchAndPriceCplexApplication {
     public static class GraphJob {
         private BranchAndPriceCplex branchAndPriceCplex;
 
-        public List<Integer> graphJob(String pathToGraph) {
+        List<Integer> graphJob(String pathToGraph) {
             Graph graph;
             try (BufferedReader reader = new BufferedReader(new FileReader(pathToGraph))) {
                 graph = GraphParser.fromStream(reader.lines());
@@ -66,7 +66,7 @@ public class BranchAndPriceCplexApplication {
             return branchAndPriceCplex.getMaxClique();
         }
 
-        public BranchAndPriceCplex getAlgorithm() {
+        BranchAndPriceCplex getAlgorithm() {
             return branchAndPriceCplex;
         }
     }
