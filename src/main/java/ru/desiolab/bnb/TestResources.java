@@ -19,7 +19,7 @@ public class TestResources {
     public static void main(String[] args) throws IOException {
         File resourcesDir = new File("resources");
         BufferedWriter writer = new BufferedWriter(new FileWriter("output.txt"));
-        BranchAndBoundCplexApplication.GraphJob graphJob = new BranchAndBoundCplexApplication.GraphJob();
+        BranchAndCutCplexApplication.GraphJob graphJob = new BranchAndCutCplexApplication.GraphJob();
         List<File> files = Arrays.stream(resourcesDir.listFiles()).sorted(Comparator.comparingLong(File::length)).collect(Collectors.toList());
         for (File testFile : files) {
             System.out.println(testFile.getName());
@@ -37,7 +37,7 @@ public class TestResources {
                 List<Integer> nodes = graphJob.getAlgorithm().getMaxClique();
                 writer.write(testFile.getName() + " " + nodes.size() + " >=1hr");
                 writer.write("\n");
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             writer.flush();

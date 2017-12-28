@@ -2,7 +2,7 @@ package ru.desiolab.bnb;
 
 import com.google.common.util.concurrent.SimpleTimeLimiter;
 import ilog.concert.IloException;
-import ru.desiolab.bnb.algorithms.BranchAndPriceCplex;
+import ru.desiolab.bnb.algorithms.BranchAndCutCplex;
 import ru.desiolab.bnb.algorithms.GreedyGraphColoringAlgorithm;
 import ru.desiolab.bnb.graph.Graph;
 import ru.desiolab.bnb.graph.GraphParser;
@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class BranchAndPriceCplexApplication {
+public class BranchAndCutCplexApplication {
     public static void main(String[] args) throws IloException {
         String pathToGraph = args[0];
 
@@ -48,7 +48,7 @@ public class BranchAndPriceCplexApplication {
     }
 
     public static class GraphJob {
-        private BranchAndPriceCplex branchAndPriceCplex;
+        private BranchAndCutCplex branchAndCutCplex;
 
         List<Integer> graphJob(String pathToGraph) {
             Graph graph;
@@ -61,13 +61,13 @@ public class BranchAndPriceCplexApplication {
             coloringAlgorithm.calculate();
             List<Set<Node>> independentSets = coloringAlgorithm.getIndependentSets();
             int chromaticNumber = independentSets.size();
-            this.branchAndPriceCplex = new BranchAndPriceCplex(graph.getNodes(), independentSets, chromaticNumber);
-            branchAndPriceCplex.compute();
-            return branchAndPriceCplex.getMaxClique();
+            this.branchAndCutCplex = new BranchAndCutCplex(graph.getNodes(), independentSets, chromaticNumber);
+            branchAndCutCplex.compute();
+            return branchAndCutCplex.getMaxClique();
         }
 
-        BranchAndPriceCplex getAlgorithm() {
-            return branchAndPriceCplex;
+        BranchAndCutCplex getAlgorithm() {
+            return branchAndCutCplex;
         }
     }
 }

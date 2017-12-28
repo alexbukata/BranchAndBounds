@@ -11,7 +11,7 @@ import ru.desiolab.bnb.graph.Node;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class BranchAndPriceCplex {
+public class BranchAndCutCplex {
     private final static double EPSILON = 0.01;
 
     private final List<Node> nodes;
@@ -21,9 +21,9 @@ public class BranchAndPriceCplex {
     private IloCplex cplex;
     private IloNumVar[] x;
 
-    public BranchAndPriceCplex(List<Node> nodes,
-                               List<Set<Node>> independentSets,
-                               Integer chromaticNumber) {
+    public BranchAndCutCplex(List<Node> nodes,
+                             List<Set<Node>> independentSets,
+                             Integer chromaticNumber) {
         this.nodes = nodes;
         this.independentSets = independentSets;
         this.chromaticNumber = chromaticNumber;
@@ -120,7 +120,7 @@ public class BranchAndPriceCplex {
                 indexes.add(i);
             }
         }
-        List<Node> clique = nodes.stream().filter(indexes::contains).collect(Collectors.toList());
+        List<Node> clique = nodes.stream().filter(node -> indexes.contains(node.getIndex())).collect(Collectors.toList());
         for (Node node1 : clique) {
             for (Node node2 : clique) {
                 if (!node1.equals(node2) && !(node1.getNeighbours().contains(node2) && node2.getNeighbours().contains(node1))) {
